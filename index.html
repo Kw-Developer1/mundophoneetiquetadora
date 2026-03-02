@@ -1,14 +1,22 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <title>Mundo Phone - Etiquetadora</title>
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Drag & Drop overlay global -->
+<div class="drop-overlay" id="drop-overlay">
+    <div class="drop-overlay-inner">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <p>Suelta aquí tu archivo</p>
+    </div>
+</div>
 
 <div class="header">
     <div class="logo">
@@ -20,6 +28,9 @@
     </div>
     <div class="header-actions">
         <input type="file" id="file-input" accept="image/*,.pdf" style="display:none">
+        <button class="btn btn-ghost btn-theme" id="btn-theme" onclick="toggleTheme()" title="Cambiar tema">
+            <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
         <button class="btn btn-ghost" onclick="document.getElementById('file-input').click()">
             <i class="fa-solid fa-arrow-up-from-bracket"></i> Subir
         </button>
@@ -30,7 +41,7 @@
 </div>
 
 <div class="canvas-wrapper">
-    <div class="canvas-card">
+    <div class="canvas-card" id="drop-zone">
         <div class="canvas-toolbar">
             <div class="toolbar-left">
                 <div class="dot dot-red"></div>
@@ -38,12 +49,38 @@
                 <div class="dot dot-green"></div>
                 <span class="toolbar-label">editor</span>
             </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <button class="btn-remove-file" id="btn-remove-file" onclick="removeFile()" style="display:none" title="Eliminar archivo"><i class="fa-solid fa-xmark"></i> Eliminar</button>
+                <span class="toolbar-hint">
+                <i class="fa-solid fa-hand-pointer"></i> Arrastra un archivo aquí
+            </span>
+            </div>
         </div>
         <div class="img-box">
             <img id="main-image">
             <div class="empty-state">
                 <i class="fa-regular fa-image"></i>
-                <p>Sube una imagen o PDF para comenzar</p>
+                <p>Sube o arrastra una imagen / PDF</p>
+            </div>
+        </div>
+
+        <!-- Barra de navegación PDF -->
+        <div class="pdf-nav" id="pdf-nav">
+            <span class="pdf-nav-label"><i class="fa-regular fa-file-pdf"></i></span>
+            <button class="pdf-nav-btn" id="pdf-prev" onclick="changePdfPage(-1)">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="pdf-page-pills" id="pdf-pills"></div>
+            <div class="pdf-page-input-wrap" id="pdf-manual-wrap">
+                <input type="number" class="pdf-page-input" id="pdf-manual-input" min="1" placeholder="Nº">
+                <button class="pdf-page-go" onclick="goToManualPage()">Ir</button>
+            </div>
+            <button class="pdf-nav-btn" id="pdf-next" onclick="changePdfPage(1)">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <span class="pdf-total" id="pdf-total"></span>
+            <div class="pdf-loading" id="pdf-loading">
+                <i class="fa-solid fa-circle-notch"></i> Cargando…
             </div>
         </div>
     </div>
