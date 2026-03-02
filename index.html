@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mundo Phone - Etiquetadora</title>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">
+    <div class="logo">
+        <div class="logo-icon"><i class="fa-solid fa-tag"></i></div>
+        <div>
+            <div class="logo-text">Mundo Phone</div>
+            <div class="logo-sub">Etiqueta</div>
+        </div>
+    </div>
+    <div class="header-actions">
+        <input type="file" id="file-input" accept="image/*,.pdf" style="display:none">
+        <button class="btn btn-ghost" onclick="document.getElementById('file-input').click()">
+            <i class="fa-solid fa-arrow-up-from-bracket"></i> Subir
+        </button>
+        <button class="btn btn-primary" id="btn-crop">
+            <i class="fa-solid fa-scissors"></i> Recortar e imprimir
+        </button>
+    </div>
+</div>
+
+<div class="canvas-wrapper">
+    <div class="canvas-card">
+        <div class="canvas-toolbar">
+            <div class="toolbar-left">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+                <span class="toolbar-label">editor</span>
+            </div>
+        </div>
+        <div class="img-box">
+            <img id="main-image">
+            <div class="empty-state">
+                <i class="fa-regular fa-image"></i>
+                <p>Sube una imagen o PDF para comenzar</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="history-panel closed" id="history-panel">
+    <div class="history-header" onclick="toggleHistory()">
+        <div class="history-title">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            Historial
+        </div>
+        <div class="history-controls">
+            <button class="btn-clear" onclick="clearHistory(event)">
+                <i class="fa-solid fa-trash"></i> Borrar todo
+            </button>
+            <div class="toggle-icon"><i class="fa-solid fa-chevron-up"></i></div>
+        </div>
+    </div>
+    <div class="history-body">
+        <div class="gallery" id="gallery"></div>
+    </div>
+</div>
+
+<div class="modal" id="modal" onclick="closeModal()">
+    <div class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></div>
+    <img id="modal-img">
+</div>
+
+<div id="print-area"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
