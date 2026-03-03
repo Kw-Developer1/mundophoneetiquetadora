@@ -66,6 +66,80 @@ body {
 }
 
 /* ══════════════════════════════════
+   NAV LOADING SCREEN
+══════════════════════════════════ */
+.nav-loading {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #0a0a0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+[data-theme="light"] .nav-loading {
+    background: #f0f4f8;
+}
+
+.nav-loading.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.nav-loading.hiding {
+    opacity: 0;
+}
+
+.nav-loading-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-loading-logo {
+    width: 200px;
+    max-width: 60vw;
+    animation: logo-breathe 1.8s ease-in-out infinite;
+    /* en tema claro añadimos filtro para que se vea bien */
+}
+
+[data-theme="light"] .nav-loading-logo {
+    filter: invert(1);
+}
+
+@keyframes logo-breathe {
+    0%, 100% { opacity: 0.4; transform: scale(0.97); }
+    50%       { opacity: 1;   transform: scale(1.03); }
+}
+
+/* ══════════════════════════════════
+   BTN NAV (icono papel)
+══════════════════════════════════ */
+.btn-nav {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+}
+
+.btn-nav i {
+    font-size: 15px !important;
+    color: var(--text-dim);
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-nav:hover i {
+    color: var(--accent);
+    transform: translateY(-1px);
+}
+
+/* ══════════════════════════════════
    DRAG & DROP OVERLAY
 ══════════════════════════════════ */
 .drop-overlay {
@@ -114,7 +188,6 @@ body {
     50% { transform: translateY(-8px); }
 }
 
-/* Drop zone highlight on the canvas card */
 .canvas-card.drag-over {
     border-color: var(--accent) !important;
     box-shadow: 0 0 0 3px rgba(71,181,255,0.2);
@@ -220,7 +293,6 @@ body {
 }
 .btn-primary:active { transform: translateY(0); }
 
-/* Theme toggle — square icon button */
 .btn-theme {
     width: 36px;
     height: 36px;

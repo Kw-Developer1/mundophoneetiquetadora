@@ -6,9 +6,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <link rel="icon" type="image/png" href="https://r2.fivemanage.com/6UIf1zst1DpiMJ7emslop/mundophone-logo-blanco.png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- ░░ LOADING SCREEN ░░ -->
+<div class="nav-loading" id="nav-loading">
+    <div class="nav-loading-inner">
+        <img src="https://r2.fivemanage.com/6UIf1zst1DpiMJ7emslop/mundophone-logo-blanco.png" class="nav-loading-logo" alt="Mundo Phone">
+    </div>
+</div>
 
 <!-- Drag & Drop overlay global -->
 <div class="drop-overlay" id="drop-overlay">
@@ -28,6 +36,12 @@
     </div>
     <div class="header-actions">
         <input type="file" id="file-input" accept="image/*,.pdf" style="display:none">
+
+        <!-- ░░ BOTÓN NAVEGACIÓN ░░ -->
+        <button class="btn btn-ghost btn-nav" id="btn-nav" onclick="navigateTo('#')" title="Ir a otra página">
+            <i class="fa-regular fa-file-lines"></i>
+        </button>
+
         <button class="btn btn-ghost btn-theme" id="btn-theme" onclick="toggleTheme()" title="Cambiar tema">
             <i class="fa-solid fa-moon" id="theme-icon"></i>
         </button>
@@ -113,5 +127,20 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="script.js"></script>
+<script>
+
+    function navigateTo(url) {
+        const screen = document.getElementById('nav-loading');
+
+        // Fase 1 — fade IN
+        screen.classList.add('visible');
+        setTimeout(() => {
+            screen.classList.add('hiding');
+            setTimeout(() => {
+                window.location.href = url;
+            }, 600); // duración del fade-out
+        }, 1600);
+    }
+</script>
 </body>
 </html>
