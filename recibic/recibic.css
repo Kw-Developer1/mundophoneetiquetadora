@@ -256,6 +256,23 @@ body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+  
+    body, .receipt {
+    color: #000 !important;
+  }
+
+  .rec-row .l,
+  .rec-row .v,
+  .rec-section,
+  .rec-company,
+  .rec-sub,
+  .rec-footer,
+  .cp-rec-num,
+  .cp-rec-concepto {
+    color: #000 !important;
+  }
+
+
 
   .receipt {
     box-shadow: none !important;
