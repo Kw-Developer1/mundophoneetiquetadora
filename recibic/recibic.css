@@ -237,16 +237,16 @@ body {
   }
 
   .rec-row { display: flex !important; justify-content: space-between !important; }
-  .rec-row .l { color: #555 !important; flex-shrink: 0 !important; }
+  .rec-row .l { color: #000 !important; flex-shrink: 0 !important; }
   .rec-row .v { color: #000 !important; font-weight: 600 !important; text-align: right !important; }
   .rec-total  { display: flex !important; justify-content: space-between !important; color: #000 !important; font-weight: 800 !important; font-size: 11pt !important; }
-  .rec-section { color: #555 !important; }
+  .rec-section { color: #000 !important; }
   .rec-company { color: #000 !important; }
-  .rec-sub, .rec-footer { color: #555 !important; }
+  .rec-sub, .rec-footer { color: #000 !important; }
 
   .rec-estado {
     background: #e0f7ef !important;
-    color: #006647 !important;
+    color: #000 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
