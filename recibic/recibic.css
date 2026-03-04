@@ -1,11 +1,11 @@
 :root {
-  --ink:        #07111a;   /* antes #0d1b2a — más oscuro */
-  --ink-mid:    #132c4a;   /* antes #1e3a5f — más oscuro */
+  --ink:        #07111a;
+  --ink-mid:    #132c4a;
   --blue:       #1a6cff;
   --blue-lt:    #3d84ff;
   --slate:      #f2f5fb;
   --border:     #dce4f0;
-  --muted:      #4f647f;   /* antes #7a8faa — MUCHO más legible */
+  --muted:      #4f647f;
   --white:      #ffffff;
   --green:      #00b67a;
   --red:        #ff3a3a;
@@ -201,7 +201,11 @@ body {
   .preview-actions .btn { flex: 1; justify-content: center; }
 }
 
-/* ── PRINT ── */
+/* ══════════════════════════════════════════════
+   PRINT — Optimizado para impresora térmica
+   Todo el texto forzado a negro puro (#000)
+   y font-weight mínimo 700 para máximo contraste
+   ══════════════════════════════════════════════ */
 @media print {
   @page { size: 80mm auto; margin: 3mm 3mm 3mm 5mm; }
 
@@ -217,6 +221,8 @@ body {
     background: white !important;
     padding: 0 !important;
     display: block !important;
+    /* Negro puro base para toda la página */
+    color: #000 !important;
   }
 
   .container {
@@ -236,44 +242,86 @@ body {
     print-color-adjust: exact !important;
   }
 
-  .rec-row { display: flex !important; justify-content: space-between !important; }
-  .rec-row .l { color: #000 !important; flex-shrink: 0 !important; }
-  .rec-row .v { color: #000 !important; font-weight: 600 !important; text-align: right !important; }
-  .rec-total  { display: flex !important; justify-content: space-between !important; color: #000 !important; font-weight: 800 !important; font-size: 11pt !important; }
-  .rec-section { color: #000 !important; }
-  .rec-company { color: #000 !important; }
-  .rec-sub, .rec-footer { color: #000 !important; }
-
-  .rec-estado {
-    background: #e0f7ef !important;
-    color: #000 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  .rec-internal-badge {
-    background: #0d1b2a !important;
-    color: #fff !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  
-    body, .receipt {
-    color: #000 !important;
-  }
-
+  /* ── Todas las tipografías: negro puro + bold ── */
+  body,
+  .receipt,
+  .rec-row,
   .rec-row .l,
   .rec-row .v,
   .rec-section,
   .rec-company,
   .rec-sub,
   .rec-footer,
+  .rec-total,
+  .rec-head,
   .cp-rec-num,
-  .cp-rec-concepto {
+  .cp-rec-concepto,
+  .cut {
     color: #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
+  /* ── Etiquetas (lado izquierdo): bold para que se lean bien ── */
+  .rec-row .l {
+    color: #000 !important;
+    font-weight: 700 !important;
+    flex-shrink: 0 !important;
+  }
 
+  /* ── Valores (lado derecho): negrita máxima ── */
+  .rec-row .v {
+    color: #000 !important;
+    font-weight: 800 !important;
+    text-align: right !important;
+  }
 
+  /* ── Secciones y empresa: extra bold ── */
+  .rec-section {
+    color: #000 !important;
+    font-weight: 800 !important;
+  }
+  .rec-company {
+    color: #000 !important;
+    font-weight: 900 !important;
+  }
+
+  /* ── Subtítulos y pie de página ── */
+  .rec-sub,
+  .rec-footer {
+    color: #000 !important;
+    font-weight: 600 !important;
+  }
+
+  /* ── Total: máximo énfasis ── */
+  .rec-total {
+    display: flex !important;
+    justify-content: space-between !important;
+    color: #000 !important;
+    font-weight: 900 !important;
+    font-size: 11pt !important;
+  }
+
+  /* ── Estado PAGADO: fondo claro + texto negro ── */
+  .rec-estado {
+    background: #d0f0e4 !important;
+    color: #000 !important;
+    font-weight: 900 !important;
+    border: 2px solid #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ── Badge interno: fondo negro, texto blanco ── */
+  .rec-internal-badge {
+    background: #000 !important;
+    color: #fff !important;
+    font-weight: 800 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ── Recibo: sin sombras ni bordes innecesarios ── */
   .receipt {
     box-shadow: none !important;
     border: none !important;
@@ -281,12 +329,15 @@ body {
     padding: 2mm 0 !important;
     page-break-inside: avoid;
     break-inside: avoid;
+    color: #000 !important;
   }
   .receipt + .receipt { margin-top: 0 !important; }
+
   .cut {
     page-break-after: avoid !important;
     break-after: avoid !important;
     margin: 3px 0 !important;
+    color: #000 !important;
   }
 }
 
