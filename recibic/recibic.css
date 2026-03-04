@@ -1,11 +1,11 @@
 :root {
-  --ink:        #0d1b2a;
-  --ink-mid:    #1e3a5f;
+  --ink:        #07111a;   /* antes #0d1b2a — más oscuro */
+  --ink-mid:    #132c4a;   /* antes #1e3a5f — más oscuro */
   --blue:       #1a6cff;
   --blue-lt:    #3d84ff;
   --slate:      #f2f5fb;
   --border:     #dce4f0;
-  --muted:      #7a8faa;
+  --muted:      #4f647f;   /* antes #7a8faa — MUCHO más legible */
   --white:      #ffffff;
   --green:      #00b67a;
   --red:        #ff3a3a;
