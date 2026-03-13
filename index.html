@@ -34,9 +34,14 @@
             <div class="logo-sub">Etiqueta</div>
         </div>
     </div>
-    <div class="header-actions">
-        <input type="file" id="file-input" accept="image/*,.pdf" style="display:none"
+   <div class="header-actions">
+        <input type="file" id="file-input" accept="image/*,.pdf" style="display:none">
 
+        <!-- ░░ BOTÓN NAVEGACIÓN ░░ -->
+        <button class="btn btn-ghost btn-nav" id="btn-nav" onclick="navigateTo('https://mundophoneetiquetadora.vercel.app/recibic/recibic.html')" title="Ir a otra página">
+            <i class="fa-regular fa-file-lines"></i>
+        </button>
+        <input type="file" id="file-input" accept="image/*,.pdf" style="display:none"
         <button class="btn btn-ghost btn-theme" id="btn-theme" onclick="toggleTheme()" title="Cambiar tema">
             <i class="fa-solid fa-moon" id="theme-icon"></i>
         </button>
@@ -140,4 +145,5 @@
 </body>
 
 </html>
+
 
