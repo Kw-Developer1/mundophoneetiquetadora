@@ -287,24 +287,31 @@ document.getElementById('btn-crop').onclick = async () => {
     try {
         const canvas = cropper.getCroppedCanvas({ fillColor: '#fff' });
 
-        // Convertir canvas a Blob (más eficiente que base64)
         const blob = await new Promise(resolve =>
             canvas.toBlob(resolve, 'image/jpeg', 0.92)
         );
 
-        // Subir a FiveManage
-        const remoteUrl = await uploadToFiveManage(blob);
+        // Imprimir inmediatamente desde URL local (sin esperar red)
+        const localUrl = URL.createObjectURL(blob);
+        prepararImpresion(localUrl);
 
-        // Guardar solo la URL en localStorage
-        saveToHistory(remoteUrl);
-        renderGallery();
-
-        // Imprimir directamente desde la URL remota
-        prepararImpresion(remoteUrl);
+        // Subir a FiveManage en paralelo para guardar en historial
+        uploadToFiveManage(blob).then(remoteUrl => {
+            URL.revokeObjectURL(localUrl);
+            saveToHistory(remoteUrl);
+            renderGallery();
+        }).catch(err => {
+            console.error('Error subiendo a FiveManage:', err);
+            // Fallback: guardar base64 localmente
+            const reader = new FileReader();
+            reader.onload = (e) => { saveToHistory(e.target.result); renderGallery(); };
+            reader.readAsDataURL(blob);
+            alert('No se pudo subir a FiveManage, guardado localmente.\n' + err.message);
+        });
 
     } catch (err) {
         console.error(err);
-        alert('Error al subir la imagen a FiveManage:\n' + err.message);
+        alert('Error al procesar la imagen:\n' + err.message);
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-scissors"></i> Recortar e imprimir';
@@ -352,48 +359,50 @@ function closeModal() {
    IMPRESIÓN
 ══════════════════════════════════ */
 function prepararImpresion(url) {
-    const img = new Image();
-    img.crossOrigin = 'anonymous'; // necesario para URLs externas
-    img.src = url;
-    img.onload = () => {
-        const area = document.getElementById('print-area');
-        area.innerHTML = '';
-        img.style.cssText = 'display:block;width:100%;height:auto;margin:0;padding:0;';
-        area.appendChild(img);
+    // Inyectamos el <img> directamente en el DOM — el navegador
+    // puede mostrar imágenes cross-origin en un <img> tag normal.
+    // No usamos new Image() + onload porque eso activa restricciones CORS.
+    const area = document.getElementById('print-area');
+    area.innerHTML = '<img src="' + url + '" style="display:block;width:100%;height:100%;object-fit:contain;margin:0;padding:0;">';
 
-        const styleId = 'print-style';
-        if (document.getElementById(styleId)) document.getElementById(styleId).remove();
-        const style = document.createElement('style');
-        style.id = styleId;
-        style.innerHTML = [
-            '@media print {',
-            '  @page { margin: 0; size: auto; }',
-            '  html { height: auto !important; overflow: hidden !important; }',
-            '  body { height: auto !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; }',
-            '  #print-area {',
-            '    display: block !important;',
-            '    position: fixed !important;',
-            '    top: 0 !important; left: 0 !important;',
-            '    width: 100vw !important;',
-            '    height: 100vh !important;',
-            '    overflow: hidden !important;',
-            '    margin: 0 !important; padding: 0 !important; line-height: 0 !important;',
-            '  }',
-            '  #print-area img {',
-            '    display: block !important;',
-            '    width: 100% !important;',
-            '    height: 100% !important;',
-            '    object-fit: contain !important;',
-            '    margin: 0 !important; padding: 0 !important;',
-            '    page-break-after: avoid !important;',
-            '    page-break-inside: avoid !important;',
-            '  }',
-            '}'
-        ].join('\n');
-        document.head.appendChild(style);
-        setTimeout(() => window.print(), 250);
-    };
-    img.onerror = () => {
-        alert('No se pudo cargar la imagen para imprimir. Comprueba tu conexión.');
-    };
+    const styleId = 'print-style';
+    if (document.getElementById(styleId)) document.getElementById(styleId).remove();
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.innerHTML = [
+        '@media print {',
+        '  @page { margin: 0; size: auto; }',
+        '  html { height: auto !important; overflow: hidden !important; }',
+        '  body { height: auto !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; }',
+        '  #print-area {',
+        '    display: block !important;',
+        '    position: fixed !important;',
+        '    top: 0 !important; left: 0 !important;',
+        '    width: 100vw !important;',
+        '    height: 100vh !important;',
+        '    overflow: hidden !important;',
+        '    margin: 0 !important; padding: 0 !important; line-height: 0 !important;',
+        '  }',
+        '  #print-area img {',
+        '    display: block !important;',
+        '    width: 100% !important;',
+        '    height: 100% !important;',
+        '    object-fit: contain !important;',
+        '    margin: 0 !important; padding: 0 !important;',
+        '    page-break-after: avoid !important;',
+        '    page-break-inside: avoid !important;',
+        '  }',
+        '}'
+    ].join('\n');
+    document.head.appendChild(style);
+
+    // Esperar a que la imagen cargue antes de imprimir
+    const img = area.querySelector('img');
+    const doPrint = () => setTimeout(() => window.print(), 150);
+    if (img.complete) {
+        doPrint();
+    } else {
+        img.onload  = doPrint;
+        img.onerror = doPrint; // intentar imprimir igual si falla la carga
+    }
 }
