@@ -1,14 +1,23 @@
-const mainImage = document.getElementById('main-image');
-const gallery   = document.getElementById('gallery');
+const mainImage    = document.getElementById('main-image');
+const gallery      = document.getElementById('gallery');
 const historyPanel = document.getElementById('history-panel');
 let cropper;
-let db = JSON.parse(localStorage.getItem('labels_v4')) || [];
+
+// ── Base de datos: solo URLs (muy ligero en localStorage) ──
+let db = JSON.parse(localStorage.getItem('labels_v5')) || [];
 
 // ── PDF state ──
 let pdfDoc = null;
 let pdfCurrentPage = 1;
 let pdfTotalPages  = 0;
 const MAX_PILLS = 3;
+
+// ══════════════════════════════════
+//  ⚙️  FIVEMANAGE CONFIG
+//  Reemplaza con tu API key real
+// ══════════════════════════════════
+const FIVEMANAGE_API_KEY = '0Z3RtuRkKaBf4FF03cfCcAN0U0kpPoar';
+const FIVEMANAGE_UPLOAD_URL = 'https://api.fivemanage.com/api/image';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
@@ -36,11 +45,7 @@ function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('mp_theme', theme);
     const icon = document.getElementById('theme-icon');
-    if (theme === 'dark') {
-        icon.className = 'fa-solid fa-moon';
-    } else {
-        icon.className = 'fa-solid fa-sun';
-    }
+    icon.className = theme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
 }
 
 /* ══════════════════════════════════
@@ -49,13 +54,11 @@ function applyTheme(theme) {
 function initDragDrop() {
     const overlay  = document.getElementById('drop-overlay');
     const dropZone = document.getElementById('drop-zone');
-    let dragCounter = 0; // track nested dragenter/dragleave
+    let dragCounter = 0;
 
-    // Prevent default browser open-file on drop everywhere
-    document.addEventListener('dragover', (e) => e.preventDefault());
-    document.addEventListener('drop',     (e) => e.preventDefault());
+    document.addEventListener('dragover',  (e) => e.preventDefault());
+    document.addEventListener('drop',      (e) => e.preventDefault());
 
-    // Show overlay when dragging enters the window
     document.addEventListener('dragenter', (e) => {
         e.preventDefault();
         dragCounter++;
@@ -78,7 +81,6 @@ function initDragDrop() {
         dragCounter = 0;
         overlay.classList.remove('active');
         dropZone.classList.remove('drag-over');
-
         const file = e.dataTransfer.files[0];
         if (file) handleFile(file);
     });
@@ -93,7 +95,7 @@ document.getElementById('file-input').onchange = (e) => {
 };
 
 /* ══════════════════════════════════
-   FILE HANDLER (shared by button + drag)
+   FILE HANDLER
 ══════════════════════════════════ */
 function showRemoveBtn(show) {
     const btn = document.getElementById('btn-remove-file');
@@ -101,16 +103,11 @@ function showRemoveBtn(show) {
 }
 
 function removeFile() {
-    // Destroy cropper
     if (cropper) { cropper.destroy(); cropper = null; }
-    // Clear image src
     mainImage.removeAttribute('src');
-    // Hide PDF nav
     document.getElementById('pdf-nav').classList.remove('visible');
     pdfDoc = null;
-    // Reset file input so same file can be re-selected
     document.getElementById('file-input').value = '';
-    // Hide remove button
     showRemoveBtn(false);
 }
 
@@ -119,7 +116,7 @@ function handleFile(file) {
     if (file.type === 'application/pdf') {
         reader.onload = async function () {
             setLoading(true);
-            pdfDoc = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
+            pdfDoc         = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
             pdfTotalPages  = pdfDoc.numPages;
             pdfCurrentPage = 1;
             buildPdfNav();
@@ -144,7 +141,7 @@ function clearHistory(e) {
     e.stopPropagation();
     if (confirm('¿Borrar todo el historial?')) {
         db = [];
-        localStorage.removeItem('labels_v4');
+        localStorage.removeItem('labels_v5');
         renderGallery();
     }
 }
@@ -241,16 +238,77 @@ function initCropper(src) {
 }
 
 /* ══════════════════════════════════
-   RECORTAR E IMPRIMIR
+   FIVEMANAGE — subir imagen
 ══════════════════════════════════ */
-document.getElementById('btn-crop').onclick = () => {
+async function uploadToFiveManage(blob) {
+    const formData = new FormData();
+    formData.append('image', blob, 'etiqueta_' + Date.now() + '.jpg');
+
+    const res = await fetch(FIVEMANAGE_UPLOAD_URL, {
+        method: 'POST',
+        headers: { 'Authorization': FIVEMANAGE_API_KEY },
+        body: formData
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error('FiveManage error ' + res.status + ': ' + text);
+    }
+
+    const data = await res.json();
+    // FiveManage devuelve { url: "https://..." }
+    if (!data.url) throw new Error('FiveManage no devolvió URL: ' + JSON.stringify(data));
+    return data.url;
+}
+
+/* ══════════════════════════════════
+   GUARDAR EN HISTORIAL (solo URLs)
+══════════════════════════════════ */
+function saveToHistory(url) {
+    db.unshift({ id: Date.now(), url });
+    db = db.slice(0, 100); // 100 items — solo URLs, pesa casi nada
+    try {
+        localStorage.setItem('labels_v5', JSON.stringify(db));
+    } catch (e) {
+        console.warn('localStorage lleno, historial no guardado localmente.');
+    }
+}
+
+/* ══════════════════════════════════
+   BOTÓN — Recortar e imprimir
+══════════════════════════════════ */
+document.getElementById('btn-crop').onclick = async () => {
     if (!cropper) return;
-    const canvas = cropper.getCroppedCanvas({ fillColor: '#fff' });
-    const jpgUrl = canvas.toDataURL('image/jpeg', 0.95);
-    db.unshift({ id: Date.now(), url: jpgUrl });
-    localStorage.setItem('labels_v4', JSON.stringify(db.slice(0, 40)));
-    renderGallery();
-    prepararImpresion(jpgUrl);
+
+    const btn = document.getElementById('btn-crop');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Subiendo…';
+
+    try {
+        const canvas = cropper.getCroppedCanvas({ fillColor: '#fff' });
+
+        // Convertir canvas a Blob (más eficiente que base64)
+        const blob = await new Promise(resolve =>
+            canvas.toBlob(resolve, 'image/jpeg', 0.92)
+        );
+
+        // Subir a FiveManage
+        const remoteUrl = await uploadToFiveManage(blob);
+
+        // Guardar solo la URL en localStorage
+        saveToHistory(remoteUrl);
+        renderGallery();
+
+        // Imprimir directamente desde la URL remota
+        prepararImpresion(remoteUrl);
+
+    } catch (err) {
+        console.error(err);
+        alert('Error al subir la imagen a FiveManage:\n' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-scissors"></i> Recortar e imprimir';
+    }
 };
 
 /* ══════════════════════════════════
@@ -270,7 +328,7 @@ function renderGallery() {
         div.className = 'item-card';
         div.innerHTML =
             '<div class="item-thumb-wrap" onclick="openFull(\'' + item.url + '\')">' +
-            '<img src="' + item.url + '" class="item-thumb"></div>' +
+            '<img src="' + item.url + '" class="item-thumb" loading="lazy"></div>' +
             '<div class="item-footer">' +
             '<button class="btn-print" onclick="prepararImpresion(\'' + item.url + '\')">' +
             '<i class="fa-solid fa-print"></i> Imprimir</button></div>';
@@ -295,6 +353,7 @@ function closeModal() {
 ══════════════════════════════════ */
 function prepararImpresion(url) {
     const img = new Image();
+    img.crossOrigin = 'anonymous'; // necesario para URLs externas
     img.src = url;
     img.onload = () => {
         const area = document.getElementById('print-area');
@@ -306,8 +365,6 @@ function prepararImpresion(url) {
         if (document.getElementById(styleId)) document.getElementById(styleId).remove();
         const style = document.createElement('style');
         style.id = styleId;
-        // Calcular ratio para @page
-        const ratio = img.naturalHeight / img.naturalWidth;
         style.innerHTML = [
             '@media print {',
             '  @page { margin: 0; size: auto; }',
@@ -335,5 +392,8 @@ function prepararImpresion(url) {
         ].join('\n');
         document.head.appendChild(style);
         setTimeout(() => window.print(), 250);
+    };
+    img.onerror = () => {
+        alert('No se pudo cargar la imagen para imprimir. Comprueba tu conexión.');
     };
 }
