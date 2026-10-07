@@ -1,0 +1,23 @@
+{
+  "name": "mundophoneetiquetadora",
+  "version": "1.0.0",
+  "description": "Mundo Phone - Etiquetadora application with Vercel Web Analytics",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kw-Developer1/mundophoneetiquetadora.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kw-Developer1/mundophoneetiquetadora/issues"
+  },
+  "homepage": "https://github.com/Kw-Developer1/mundophoneetiquetadora#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
