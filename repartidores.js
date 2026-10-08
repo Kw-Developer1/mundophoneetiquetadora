@@ -6,6 +6,9 @@
 ══════════════════════════════════ */
 (function () {
     const KEY = 'repartidores_v1';
+    // Lista compartida: viene del archivo repartidores-data.js (generado con "Exportar").
+    const BASE = window.REPARTIDORES_BASE || { version: 0, items: [] };
+    const VKEY = 'repartidores_base_v';
 
     // Empresas de partida (sin teléfono: rellénalos con "Editar").
     const SEED = [
@@ -28,13 +31,42 @@
     function uid() { return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
     function load() {
+        // 1) Si el archivo compartido es más nuevo que lo que vio este navegador, manda el archivo.
+        const seen = Number(localStorage.getItem(VKEY) || 0);
+        if (BASE.items && BASE.items.length && BASE.version > seen) {
+            const shared = JSON.parse(JSON.stringify(BASE.items));
+            try {
+                localStorage.setItem(KEY, JSON.stringify(shared));
+                localStorage.setItem(VKEY, String(BASE.version));
+            } catch (e) { /* ignorar */ }
+            return shared;
+        }
+        // 2) Si no, lo que haya guardado en este navegador.
         try {
             const raw = localStorage.getItem(KEY);
             if (raw) return JSON.parse(raw);
         } catch (e) { /* ignorar */ }
+        // 3) Primera vez y sin archivo compartido: empresas de partida.
         const seeded = SEED.map(s => ({ id: uid(), name: s.name, phone: '', logo: '', color: s.color }));
         try { localStorage.setItem(KEY, JSON.stringify(seeded)); } catch (e) { /* ignorar */ }
         return seeded;
+    }
+
+    // Descarga repartidores-data.js con la lista actual para compartirla con todos.
+    function exportData() {
+        const out = { version: Date.now(), items: list };
+        const txt = '// Generado desde el panel Repartidores (botón Exportar).\n' +
+                    '// Sustituye este archivo en el proyecto y vuelve a subir la web.\n' +
+                    'window.REPARTIDORES_BASE = ' + JSON.stringify(out, null, 2) + ';\n';
+        const blob = new Blob([txt], { type: 'text/javascript' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'repartidores-data.js';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        try { localStorage.setItem(VKEY, String(out.version)); } catch (e) { /* ignorar */ }
     }
 
     function save() {
@@ -254,6 +286,7 @@
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('rep-overlay').classList.contains('open')) window.closeRepartidores(); });
         $('rep-search').addEventListener('input', render);
         $('rep-add').addEventListener('click', () => openForm(null));
+        $('rep-export').addEventListener('click', exportData);
         $('rep-f-cancel').addEventListener('click', closeForm);
         $('rep-f-save').addEventListener('click', submitForm);
         $('rep-f-name').addEventListener('input', refreshPreview);
