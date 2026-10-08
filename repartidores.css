@@ -1,0 +1,207 @@
+/* ══════════════════════════════════
+   REPARTIDORES — panel de contactos
+══════════════════════════════════ */
+.rep-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    background: var(--drop-overlay-bg);
+    backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+.rep-overlay.open { display: flex; }
+
+.rep-panel {
+    width: 100%;
+    max-width: 760px;
+    max-height: 90vh;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.rep-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+}
+.rep-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+}
+.rep-title i { color: var(--accent); font-size: 14px; }
+.rep-head-actions { display: flex; align-items: center; gap: 8px; }
+
+.rep-icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-dim);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+}
+.rep-icon-btn:hover { color: var(--text); border-color: var(--border-hover); }
+
+.rep-search-wrap { padding: 14px 20px 0; }
+.rep-search,
+.rep-input {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 10px 12px;
+    outline: none;
+}
+.rep-search:focus,
+.rep-input:focus { border-color: var(--accent); }
+
+/* ── Formulario añadir / editar ── */
+.rep-form {
+    display: none;
+    padding: 16px 20px;
+    margin: 14px 20px 0;
+    border: 1px dashed var(--border-hover);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+}
+.rep-form.open { display: block; }
+.rep-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.rep-form label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+.rep-form .full { grid-column: 1 / -1; }
+.rep-logo-row { display: flex; align-items: center; gap: 12px; }
+.rep-logo-preview { flex-shrink: 0; }
+.rep-logo-controls { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rep-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+/* ── Rejilla de tarjetas ── */
+.rep-body { padding: 16px 20px 20px; overflow-y: auto; }
+.rep-body::-webkit-scrollbar { width: 4px; }
+.rep-body::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 4px; }
+
+.rep-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 12px;
+}
+
+.rep-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    padding: 18px 14px 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+.rep-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+
+.rep-logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.rep-logo img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+.rep-logo.is-badge {
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+}
+
+.rep-name { font-size: 14px; font-weight: 600; word-break: break-word; }
+
+.rep-phone {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+}
+.rep-phone:hover { text-decoration: underline; }
+.rep-phone.empty { color: var(--text-muted); font-style: italic; cursor: pointer; }
+
+.rep-actions { display: flex; gap: 6px; margin-top: 2px; }
+.rep-act {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    text-decoration: none;
+}
+.rep-act:hover { color: var(--accent); border-color: var(--accent); }
+.rep-act.danger:hover { color: var(--danger); border-color: var(--danger); }
+.rep-act.ok { color: #2fb344; border-color: #2fb344; }
+
+.rep-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 36px 12px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+.rep-empty i { display: block; font-size: 26px; margin-bottom: 10px; }
+
+@media (max-width: 520px) {
+    .rep-form-grid { grid-template-columns: 1fr; }
+    .rep-grid { grid-template-columns: 1fr 1fr; }
+    .rep-card { padding: 14px 8px 10px; }
+    #btn-repartidores span { display: none; }
+}
+
+@media print { .rep-overlay { display: none !important; } }

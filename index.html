@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <link rel="icon" type="image/png" href="https://r2.fivemanage.com/6UIf1zst1DpiMJ7emslop/mundophone-logo-blanco.png">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="repartidores.css">
     <!-- Vercel Web Analytics -->
     <script>
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -44,6 +45,9 @@
 
         <!-- ░░ BOTÓN NAVEGACIÓN ░░ -->
         <input type="file" id="file-input" accept="image/*,.pdf" style="display:none">
+        <button class="btn btn-ghost" id="btn-repartidores" onclick="openRepartidores()" title="Números de repartidores">
+            <i class="fa-solid fa-truck-fast"></i> <span>Repartidores</span>
+        </button>
             
         <button class="btn btn-ghost btn-theme" id="btn-theme" onclick="toggleTheme()" title="Cambiar tema">
             <i class="fa-solid fa-moon" id="theme-icon"></i>
@@ -126,10 +130,61 @@
     <img id="modal-img">
 </div>
 
+<!-- ░░ REPARTIDORES ░░ -->
+<div class="rep-overlay" id="rep-overlay">
+    <div class="rep-panel">
+        <div class="rep-head">
+            <div class="rep-title"><i class="fa-solid fa-truck-fast"></i> Repartidores</div>
+            <div class="rep-head-actions">
+                <button class="btn btn-primary" id="rep-add" type="button"><i class="fa-solid fa-plus"></i> Añadir</button>
+                <button class="rep-icon-btn" type="button" onclick="closeRepartidores()" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+
+        <div class="rep-search-wrap">
+            <input class="rep-search" id="rep-search" type="search" placeholder="Buscar por nombre o número…" autocomplete="off">
+        </div>
+
+        <div class="rep-form" id="rep-form">
+            <div class="rep-title" style="margin-bottom:12px;font-size:13px;"><span id="rep-form-title">Nuevo repartidor</span></div>
+            <div class="rep-form-grid">
+                <div>
+                    <label for="rep-f-name">Empresa</label>
+                    <input class="rep-input" id="rep-f-name" type="text" placeholder="SEUR, Correos…" autocomplete="off">
+                </div>
+                <div>
+                    <label for="rep-f-phone">Teléfono</label>
+                    <input class="rep-input" id="rep-f-phone" type="tel" placeholder="900 000 000" autocomplete="off">
+                </div>
+                <div class="full">
+                    <label>Logo</label>
+                    <div class="rep-logo-row">
+                        <div class="rep-logo-preview" id="rep-logo-preview"></div>
+                        <div class="rep-logo-controls">
+                            <input class="rep-input" id="rep-f-file" type="file" accept="image/*">
+                            <input class="rep-input" id="rep-f-url" type="url" placeholder="…o pega la URL de una imagen">
+                        </div>
+                        <button class="rep-icon-btn" id="rep-f-clear" type="button" title="Quitar logo"><i class="fa-solid fa-eraser"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="rep-form-actions">
+                <button class="btn btn-ghost" id="rep-f-cancel" type="button">Cancelar</button>
+                <button class="btn btn-primary" id="rep-f-save" type="button">Guardar</button>
+            </div>
+        </div>
+
+        <div class="rep-body">
+            <div class="rep-grid" id="rep-grid"></div>
+        </div>
+    </div>
+</div>
+
 <div id="print-area"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="script.js"></script>
+<script src="repartidores.js"></script>
 <script>
 
     function navigateTo(url) {
